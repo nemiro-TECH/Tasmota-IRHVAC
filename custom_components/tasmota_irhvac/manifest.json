@@ -1,10 +1,9 @@
 {
   "domain": "tasmota_irhvac",
   "name": "Tasmota Irhvac",
-  "version": "2026.4.5",
-  "documentation": "https://github.com/hristo-atanasov/Tasmota-IRHVAC",
-  "issue_tracker": "https://github.com/hristo-atanasov/Tasmota-IRHVAC/issues",
-  "homeassistant": "2024.11.0",
+  "version": "v.1.0.0",
+  "documentation": "https://github.com/nemiro-TECH/Tasmota-IRHVAC",
+  "issue_tracker": "https://github.com/nemiro-TECH/Tasmota-IRHVAC/issues",
   "iot_class": "local_push",
   "integration_type": "hub",
   "requirements": [],
@@ -14,6 +13,7 @@
     "sensor"
   ],
   "codeowners": [
+    "@nemiro-TECH",
     "@hristo-atanasov",
     "@nao-pon"
   ]
