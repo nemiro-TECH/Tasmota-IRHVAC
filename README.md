@@ -1,8 +1,8 @@
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://my.home-assistant.io/redirect/hacs_repository/?owner=hristo-atanasov&repository=Tasmota-IRHVAC&category=integration)
-[![GitHub Release](https://img.shields.io/github/release/hristo-atanasov/Tasmota-IRHVAC.svg?style=for-the-badge&color=blue)](https://github.com/hristo-atanasov/Tasmota-IRHVAC/releases)
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://my.home-assistant.io/redirect/hacs_repository/?owner=nemiro-TECH&repository=Tasmota-IRHVAC&category=integration)
+[![GitHub Release](https://img.shields.io/github/release/nemiro-TECH/Tasmota-IRHVAC.svg?style=for-the-badge&color=blue)](https://github.com/nemiro-TECH/Tasmota-IRHVAC/releases)
 [![HA Minimum Version](https://img.shields.io/badge/Home%20Assistant-2024.11%2B-blue?style=for-the-badge&logo=home-assistant)](https://www.home-assistant.io/)
-[![License](https://img.shields.io/github/license/hristo-atanasov/Tasmota-IRHVAC.svg?style=for-the-badge)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/hristo-atanasov/Tasmota-IRHVAC?style=for-the-badge)](https://github.com/hristo-atanasov/Tasmota-IRHVAC/stargazers)
+[![License](https://img.shields.io/github/license/nemiro-TECH/Tasmota-IRHVAC.svg?style=for-the-badge)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/nemiro-TECH/Tasmota-IRHVAC?style=for-the-badge)](https://github.com/nemiro-TECH/Tasmota-IRHVAC/stargazers)
 
 # Tasmota IRHVAC
 
@@ -31,13 +31,13 @@ This integration is not in the HACS default store yet — you need to add it as 
 
 **Option A — one-click (recommended):**
 
-[![Add to HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=hristo-atanasov&repository=Tasmota-IRHVAC&category=integration)
+[![Add to HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=nemiro-TECH&repository=Tasmota-IRHVAC&category=integration)
 
 **Option B — manually:**
 
 1. Open HACS in Home Assistant
 2. Click the three-dot menu (⋮) in the top-right corner and select **Custom repositories**
-3. Paste `https://github.com/hristo-atanasov/Tasmota-IRHVAC` in the URL field, set category to **Integration**, and click **Add**
+3. Paste `https://github.com/nemiro-TECH/Tasmota-IRHVAC` in the URL field, set category to **Integration**, and click **Add**
 4. Search for **Tasmota IRHVAC** and install it
 5. Restart Home Assistant
 
@@ -62,23 +62,23 @@ The setup wizard will guide you through two steps:
 
 ## Documentation
 
-Full documentation is available on the [**Wiki**](https://github.com/hristo-atanasov/Tasmota-IRHVAC/wiki):
+Full documentation is available on the [**Wiki**](https://github.com/nemiro-TECH/Tasmota-IRHVAC/wiki):
 
-- [How it works](https://github.com/hristo-atanasov/Tasmota-IRHVAC/wiki/Home#how-it-works)
-- [Hardware & wiring](https://github.com/hristo-atanasov/Tasmota-IRHVAC/wiki/Home#hardware)
-- [Tasmota configuration](https://github.com/hristo-atanasov/Tasmota-IRHVAC/wiki/Home#tasmota-configuration)
-- [UI setup](https://github.com/hristo-atanasov/Tasmota-IRHVAC/wiki/Home#setup-via-ui-recommended)
-- [YAML configuration reference](https://github.com/hristo-atanasov/Tasmota-IRHVAC/wiki/Home#configuration-reference)
-- [Services](https://github.com/hristo-atanasov/Tasmota-IRHVAC/wiki/Home#services)
-- [Template switches](https://github.com/hristo-atanasov/Tasmota-IRHVAC/wiki/Home#template-switches-example)
-- [Sending arbitrary IR codes](https://github.com/hristo-atanasov/Tasmota-IRHVAC/wiki/Home#sending-arbitrary-ir-codes)
+- [How it works](https://github.com/nemiro-TECH/Tasmota-IRHVAC/wiki/Home#how-it-works)
+- [Hardware & wiring](https://github.com/nemiro-TECH/Tasmota-IRHVAC/wiki/Home#hardware)
+- [Tasmota configuration](https://github.com/nemiro-TECH/Tasmota-IRHVAC/wiki/Home#tasmota-configuration)
+- [UI setup](https://github.com/nemiro-TECH/Tasmota-IRHVAC/wiki/Home#setup-via-ui-recommended)
+- [YAML configuration reference](https://github.com/nemiro-TECH/Tasmota-IRHVAC/wiki/Home#configuration-reference)
+- [Services](https://github.com/nemiro-TECH/Tasmota-IRHVAC/wiki/Home#services)
+- [Template switches](https://github.com/nemiro-TECH/Tasmota-IRHVAC/wiki/Home#template-switches-example)
+- [Sending arbitrary IR codes](https://github.com/nemiro-TECH/Tasmota-IRHVAC/wiki/Home#sending-arbitrary-ir-codes)
 
 ---
 
 ## Community
 
 - [HA Community Thread](https://community.home-assistant.io/t/tasmota-mqtt-irhvac-controler/162915/31)
-- [Issue Tracker](https://github.com/hristo-atanasov/Tasmota-IRHVAC/issues)
+- [Issue Tracker](https://github.com/nemiro-TECH/Tasmota-IRHVAC/issues)
 
 ---
 
