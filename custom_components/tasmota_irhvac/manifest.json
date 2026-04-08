@@ -12,9 +12,5 @@
     "mqtt",
     "sensor"
   ],
-  "codeowners": [
-    "@nemiro-TECH",
-    "@hristo-atanasov",
-    "@nao-pon"
-  ]
+  "codeowners": ["@nemiro-TECH"]
 }
