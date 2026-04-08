@@ -63,6 +63,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import cached_property, callback
 from homeassistant.helpers import event as ha_event
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.util.unit_conversion import TemperatureConverter
 
@@ -405,31 +406,10 @@ SERVICE_TO_METHOD = {
 }
 
 
-async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
-    """Set up the generic thermostat platform."""
-    vendor = config.get(CONF_VENDOR)
-    protocol = config.get(CONF_PROTOCOL)
-    name = config.get(CONF_NAME)
-
-    if DATA_KEY not in hass.data:
-        hass.data[DATA_KEY] = {}
-
-    if vendor is None:
-        if protocol is None:
-            _LOGGER.error('Neither vendor nor protocol provided for "%s"!', name)
-            return
-
-        vendor = protocol
-
-    tasmotaIrhvac = TasmotaIrhvac(
-        hass,
-        vendor,
-        config,
-    )
-    uuidstr = uuid.uuid4().hex
-    hass.data[DATA_KEY][uuidstr] = tasmotaIrhvac
-
-    async_add_entities([tasmotaIrhvac])
+async def _async_register_services(hass):
+    """Register custom services (idempotent — safe to call multiple times)."""
+    if hass.services.has_service(DOMAIN, SERVICE_ECONO_MODE):
+        return
 
     async def async_service_handler(service):
         """Map services to methods on TasmotaIrhvac."""
@@ -462,6 +442,115 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         hass.services.async_register(
             DOMAIN, irhvac_service, async_service_handler, schema=schema
         )
+
+
+def _config_from_entry(entry) -> dict:
+    """Build a full config dict from a config entry, applying all defaults."""
+    data = {**entry.data, **entry.options}
+
+    # Apply defaults for any keys not set by the user
+    _defaults = {
+        CONF_MQTT_DELAY: DEFAULT_MQTT_DELAY,
+        CONF_MAX_TEMP: DEFAULT_MAX_TEMP,
+        CONF_MIN_TEMP: DEFAULT_MIN_TEMP,
+        CONF_TARGET_TEMP: DEFAULT_TARGET_TEMP,
+        CONF_INITIAL_OPERATION_MODE: DEFAULT_INITIAL_OPERATION_MODE,
+        CONF_PRECISION: DEFAULT_PRECISION,
+        CONF_TEMP_STEP: PRECISION_WHOLE,
+        CONF_MODES_LIST: DEFAULT_MODES_LIST,
+        CONF_FAN_LIST: DEFAULT_FAN_LIST,
+        CONF_SWING_LIST: DEFAULT_SWING_LIST,
+        CONF_QUIET: DEFAULT_CONF_QUIET,
+        CONF_TURBO: DEFAULT_CONF_TURBO,
+        CONF_ECONO: DEFAULT_CONF_ECONO,
+        CONF_MODEL: DEFAULT_CONF_MODEL,
+        CONF_CELSIUS: DEFAULT_CONF_CELSIUS,
+        CONF_LIGHT: DEFAULT_CONF_LIGHT,
+        CONF_FILTER: DEFAULT_CONF_FILTER,
+        CONF_CLEAN: DEFAULT_CONF_CLEAN,
+        CONF_BEEP: DEFAULT_CONF_BEEP,
+        CONF_SLEEP: DEFAULT_CONF_SLEEP,
+        CONF_KEEP_MODE: DEFAULT_CONF_KEEP_MODE,
+        CONF_IGNORE_OFF_TEMP: DEFAULT_IGNORE_OFF_TEMP,
+        CONF_TOGGLE_LIST: [],
+        CONF_SPECIAL_MODE: "",
+    }
+    for key, default in _defaults.items():
+        if key not in data:
+            data[key] = default
+
+    # Use the config entry id as the entity unique_id
+    data[CONF_UNIQUE_ID] = entry.entry_id
+
+    # precision and temp_step are stored as strings from SelectSelector — convert to float
+    for key in [CONF_PRECISION, CONF_TEMP_STEP]:
+        if isinstance(data.get(key), str):
+            try:
+                data[key] = float(data[key])
+            except (ValueError, TypeError):
+                pass
+
+    # Empty strings mean "not set" for optional topic / sensor fields
+    for key in [
+        CONF_AVAILABILITY_TOPIC,
+        CONF_TEMP_SENSOR,
+        CONF_HUMIDITY_SENSOR,
+        CONF_POWER_SENSOR,
+        CONF_SWINGV,
+        CONF_SWINGH,
+        CONF_STATE_TOPIC + "_2",
+    ]:
+        if data.get(key) == "":
+            data[key] = None
+
+    # away_temp == 0 means the away preset is disabled
+    away_temp = data.get(CONF_AWAY_TEMP, 0)
+    data[CONF_AWAY_TEMP] = None if not away_temp else float(away_temp)
+
+    return data
+
+
+async def async_setup_entry(hass, config_entry, async_add_entities):
+    """Set up a Tasmota IRHVAC climate entity from a config entry."""
+    config = _config_from_entry(config_entry)
+    vendor = config[CONF_VENDOR]
+
+    if DATA_KEY not in hass.data:
+        hass.data[DATA_KEY] = {}
+
+    entity = TasmotaIrhvac(hass, vendor, config)
+    hass.data[DATA_KEY][uuid.uuid4().hex] = entity
+
+    async_add_entities([entity])
+    await _async_register_services(hass)
+
+
+async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
+    """Set up the generic thermostat platform."""
+    vendor = config.get(CONF_VENDOR)
+    protocol = config.get(CONF_PROTOCOL)
+    name = config.get(CONF_NAME)
+
+    if DATA_KEY not in hass.data:
+        hass.data[DATA_KEY] = {}
+
+    if vendor is None:
+        if protocol is None:
+            _LOGGER.error('Neither vendor nor protocol provided for "%s"!', name)
+            return
+
+        vendor = protocol
+
+    tasmotaIrhvac = TasmotaIrhvac(
+        hass,
+        vendor,
+        config,
+    )
+    uuidstr = uuid.uuid4().hex
+    hass.data[DATA_KEY][uuidstr] = tasmotaIrhvac
+
+    async_add_entities([tasmotaIrhvac])
+    await _async_register_services(hass)
 
 
 class TasmotaIrhvac(RestoreEntity, ClimateEntity):
@@ -590,6 +679,17 @@ class TasmotaIrhvac(RestoreEntity, ClimateEntity):
             self._support_flags = self._support_flags | ClimateEntityFeature.PRESET_MODE
         if self._attr_swing_mode is not None:
             self._support_flags = self._support_flags | ClimateEntityFeature.SWING_MODE
+
+    @property
+    def device_info(self) -> DeviceInfo | None:
+        """Return device info so each config-entry entity appears as its own HA device."""
+        if not self._attr_unique_id:
+            return None
+        return DeviceInfo(
+            identifiers={(DOMAIN, self._attr_unique_id)},
+            name=self._attr_name,
+            manufacturer=self._vendor,
+        )
 
     async def async_added_to_hass(self):
         # Replacing `async_track_state_change` with `async_track_state_change_event`

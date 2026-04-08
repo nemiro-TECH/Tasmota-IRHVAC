@@ -1,0 +1,122 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Add AC Device",
+        "description": "Connect a Tasmota IR transceiver to Home Assistant via MQTT.",
+        "data": {
+          "name": "Device Name",
+          "vendor": "AC Vendor / Protocol",
+          "command_topic": "MQTT Command Topic",
+          "state_topic": "MQTT State Topic"
+        },
+        "data_description": {
+          "vendor": "Your AC brand (e.g. SAMSUNG_AC, DAIKIN, MITSUBISHI_AC). Type to search or enter a custom protocol name.",
+          "command_topic": "MQTT topic used to send IR commands (e.g. cmnd/tasmota_ir/IRhvac).",
+          "state_topic": "MQTT topic used to receive state updates (e.g. tele/tasmota_ir/RESULT)."
+        }
+      },
+      "advanced": {
+        "title": "Advanced Settings",
+        "description": "All fields are optional — defaults will be used if left unchanged.",
+        "data": {
+          "min_temp": "Minimum Temperature",
+          "max_temp": "Maximum Temperature",
+          "target_temp": "Default Target Temperature",
+          "precision": "Temperature Precision",
+          "temp_step": "Temperature Step",
+          "celsius_mode": "Temperature Unit",
+          "supported_modes": "Supported HVAC Modes",
+          "supported_fan_speeds": "Supported Fan Speeds",
+          "supported_swing_list": "Supported Swing Modes",
+          "initial_operation_mode": "Initial Operation Mode",
+          "default_quiet_mode": "Default Quiet Mode",
+          "default_turbo_mode": "Default Turbo Mode",
+          "default_econo_mode": "Default Economy Mode",
+          "default_light_mode": "Default Light Mode",
+          "default_filter_mode": "Default Filter Mode",
+          "default_clean_mode": "Default Clean Mode",
+          "default_beep_mode": "Default Beep Mode",
+          "default_sleep_mode": "Default Sleep Mode",
+          "default_swingv": "Default Vertical Swing Position",
+          "default_swingh": "Default Horizontal Swing Position",
+          "toggle_list": "Toggle Features",
+          "keep_mode_when_off": "Keep Mode When Off",
+          "ignore_off_temp": "Ignore Temperature When Off",
+          "away_temp": "Away Temperature (0 = disabled)",
+          "temperature_sensor": "Temperature Sensor Entity",
+          "humidity_sensor": "Humidity Sensor Entity",
+          "power_sensor": "Power Sensor Entity",
+          "availability_topic": "Availability Topic",
+          "state_topic_2": "Secondary State Topic",
+          "mqtt_delay": "MQTT Delay (seconds)",
+          "hvac_model": "HVAC Model Number",
+          "special_mode": "Special Mode"
+        },
+        "data_description": {
+          "away_temp": "Temperature used for the Away preset. Set to 0 to disable the Away preset.",
+          "toggle_list": "Features that toggle on/off with each IR command (instead of explicit state).",
+          "state_topic_2": "Optional secondary MQTT topic for state feedback.",
+          "hvac_model": "Vendor-specific model number. Use -1 for default.",
+          "special_mode": "Vendor-specific special mode string (leave blank if unsure)."
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "A device with this command topic is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Configure AC Device",
+        "description": "Update device settings. Changes take effect after saving.",
+        "data": {
+          "name": "Device Name",
+          "vendor": "AC Vendor / Protocol",
+          "command_topic": "MQTT Command Topic",
+          "state_topic": "MQTT State Topic",
+          "min_temp": "Minimum Temperature",
+          "max_temp": "Maximum Temperature",
+          "target_temp": "Default Target Temperature",
+          "precision": "Temperature Precision",
+          "temp_step": "Temperature Step",
+          "celsius_mode": "Temperature Unit",
+          "supported_modes": "Supported HVAC Modes",
+          "supported_fan_speeds": "Supported Fan Speeds",
+          "supported_swing_list": "Supported Swing Modes",
+          "initial_operation_mode": "Initial Operation Mode",
+          "default_quiet_mode": "Default Quiet Mode",
+          "default_turbo_mode": "Default Turbo Mode",
+          "default_econo_mode": "Default Economy Mode",
+          "default_light_mode": "Default Light Mode",
+          "default_filter_mode": "Default Filter Mode",
+          "default_clean_mode": "Default Clean Mode",
+          "default_beep_mode": "Default Beep Mode",
+          "default_sleep_mode": "Default Sleep Mode",
+          "default_swingv": "Default Vertical Swing Position",
+          "default_swingh": "Default Horizontal Swing Position",
+          "toggle_list": "Toggle Features",
+          "keep_mode_when_off": "Keep Mode When Off",
+          "ignore_off_temp": "Ignore Temperature When Off",
+          "away_temp": "Away Temperature (0 = disabled)",
+          "temperature_sensor": "Temperature Sensor Entity",
+          "humidity_sensor": "Humidity Sensor Entity",
+          "power_sensor": "Power Sensor Entity",
+          "availability_topic": "Availability Topic",
+          "state_topic_2": "Secondary State Topic",
+          "mqtt_delay": "MQTT Delay (seconds)",
+          "hvac_model": "HVAC Model Number",
+          "special_mode": "Special Mode"
+        },
+        "data_description": {
+          "away_temp": "Temperature used for the Away preset. Set to 0 to disable the Away preset.",
+          "toggle_list": "Features that toggle on/off with each IR command (instead of explicit state).",
+          "state_topic_2": "Optional secondary MQTT topic for state feedback.",
+          "hvac_model": "Vendor-specific model number. Use -1 for default.",
+          "special_mode": "Vendor-specific special mode string (leave blank if unsure)."
+        }
+      }
+    }
+  }
+}
