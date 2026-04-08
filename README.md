@@ -27,9 +27,19 @@ Control hundreds of AC models out of the box. The integration exposes each air c
 
 ### HACS (recommended)
 
-1. Open **HACS → Integrations → Explore & Download Repositories**
-2. Search for **Tasmota IRHVAC** and install
-3. Restart Home Assistant
+This integration is not in the HACS default store yet — you need to add it as a **custom repository** first.
+
+**Option A — one-click (recommended):**
+
+[![Add to HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=hristo-atanasov&repository=Tasmota-IRHVAC&category=integration)
+
+**Option B — manually:**
+
+1. Open HACS in Home Assistant
+2. Click the three-dot menu (⋮) in the top-right corner and select **Custom repositories**
+3. Paste `https://github.com/hristo-atanasov/Tasmota-IRHVAC` in the URL field, set category to **Integration**, and click **Add**
+4. Search for **Tasmota IRHVAC** and install it
+5. Restart Home Assistant
 
 ### Manual
 
