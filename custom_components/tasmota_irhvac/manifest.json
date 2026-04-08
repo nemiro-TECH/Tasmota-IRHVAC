@@ -1,16 +1,16 @@
 {
   "domain": "tasmota_irhvac",
   "name": "Tasmota Irhvac",
-  "version": "1.0.0",
-  "documentation": "https://github.com/nemiro-TECH/Tasmota-IRHVAC",
-  "issue_tracker": "https://github.com/nemiro-TECH/Tasmota-IRHVAC/issues",
-  "iot_class": "local_push",
-  "integration_type": "hub",
-  "requirements": [],
+  "codeowners": ["@nemiro-TECH"]
   "config_flow": true,
   "dependencies": [
     "mqtt",
     "sensor"
   ],
-  "codeowners": ["@nemiro-TECH"]
+  "documentation": "https://github.com/nemiro-TECH/Tasmota-IRHVAC",
+  "integration_type": "hub",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/nemiro-TECH/Tasmota-IRHVAC/issues",
+  "requirements": [],  
+  "version": "1.0.0",
 }
