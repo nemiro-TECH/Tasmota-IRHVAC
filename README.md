@@ -79,3 +79,13 @@ Full documentation is available on the [**Wiki**](https://github.com/nemiro-TECH
 
 - [HA Community Thread](https://community.home-assistant.io/t/tasmota-mqtt-irhvac-controler/162915/31)
 - [Issue Tracker](https://github.com/nemiro-TECH/Tasmota-IRHVAC/issues)
+
+---
+
+## Credits
+
+This project is maintained by **nemiro-TECH** and is based on the original work by
+[**Hristo Atanasov**](https://github.com/hristo-atanasov/Tasmota-IRHVAC) and contributors.
+
+Forked at version **2026.4.5** (commit [`b6b8dba`](https://github.com/hristo-atanasov/Tasmota-IRHVAC/commit/b6b8dba)).
+All original authorship is acknowledged and respected — see [LICENSE](LICENSE).
