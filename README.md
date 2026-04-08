@@ -1,4 +1,4 @@
-[![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://my.home-assistant.io/redirect/hacs_repository/?owner=hristo-atanasov&repository=Tasmota-IRHVAC&category=integration)
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://my.home-assistant.io/redirect/hacs_repository/?owner=hristo-atanasov&repository=Tasmota-IRHVAC&category=integration)
 [![GitHub Release](https://img.shields.io/github/release/hristo-atanasov/Tasmota-IRHVAC.svg?style=for-the-badge&color=blue)](https://github.com/hristo-atanasov/Tasmota-IRHVAC/releases)
 [![HA Minimum Version](https://img.shields.io/badge/Home%20Assistant-2024.11%2B-blue?style=for-the-badge&logo=home-assistant)](https://www.home-assistant.io/)
 [![License](https://img.shields.io/github/license/hristo-atanasov/Tasmota-IRHVAC.svg?style=for-the-badge)](LICENSE)
