@@ -90,6 +90,60 @@ This document records the security findings identified during an audit of the Ta
 
 ---
 
+### HIGH — `mqtt.async_subscribe` called with `None` availability topic
+
+**File:** `climate.py` (`_subscribe_topics`)  
+**Risk:** After the previous fix that leaves `self.availability_topic = None` when the command topic has fewer than two `/` segments, `mqtt.async_subscribe(hass, None, handler)` was called unconditionally. Passing `None` as the topic raises a `TypeError`/`AttributeError` at startup, preventing the entity from loading.
+
+**Fix:** Wrapped the availability-topic subscription in `if self.availability_topic:`, so it is only attempted when a valid topic is available.
+
+---
+
+### HIGH — No dict type guard on `IrReceived` and `IRHVAC` payload values
+
+**File:** `climate.py` (`state_message_received`)  
+**Risk:** After extracting `json_payload["IrReceived"]` and `json_payload["IRHVAC"]`, the code assumed both were dicts and immediately performed further key lookups. A malformed MQTT message that sends these fields as non-dict types (e.g. a string, integer, or list) would raise `TypeError` in subsequent operations, crashing the handler.
+
+**Fix:** Added `isinstance(..., dict)` checks after extracting both values; non-dict values cause an early `return`.
+
+---
+
+### HIGH — `KeyError` on direct `payload["Vendor"]` access
+
+**File:** `climate.py` (`state_message_received`)  
+**Risk:** `payload["Vendor"]` raised `KeyError` if the `Vendor` field was absent in the received IRHVAC object. No malicious intent needed — a firmware version returning a different structure would crash the handler.
+
+**Fix:** Changed to `payload.get("Vendor")` which returns `None` instead of raising.
+
+---
+
+### MEDIUM — `KeyError` in `async_service_handler` on unknown service
+
+**File:** `climate.py` (`async_service_handler`)  
+**Risk:** `SERVICE_TO_METHOD.get(service.service, {})` returned an empty dict for unknown service names. The immediately following `method["method"]` then raised `KeyError`. While in practice services are only called through HA's registered service list, the pattern was fragile.
+
+**Fix:** Changed to `SERVICE_TO_METHOD.get(service.service)` and added an explicit `None` check with a log error, returning early for unknown services.
+
+---
+
+### MEDIUM — `_special_mode` used as `hvac_mode` without validating against known modes
+
+**File:** `climate.py` (`_async_power_sensor_changed`)  
+**Risk:** When the power sensor transitions to `STATE_ON` and `is_special_mode` is `True`, `self._special_mode` (an arbitrary string from config, accepted without HVAC mode validation) was directly set as `_attr_hvac_mode`. Any string value — including an empty string or an invalid mode name — would be stored as the entity's current HVAC mode, corrupting HA state.
+
+**Fix:** Added `self._special_mode in HVAC_MODES` check; only a recognised HVACMode value is used. Otherwise falls back to `self._last_on_mode`.
+
+---
+
+### LOW — Raw LWT payload logged at DEBUG level
+
+**File:** `climate.py` (`available_message_received`)  
+**Risk:** `_LOGGER.debug(msg)` logged the raw MQTT LWT (Last Will and Testament) payload. With debug logging enabled, this leaks device availability transitions to the log file.
+
+**Fix:** Removed the debug log statement.
+
+---
+
 ## Out of Scope / Accepted Risks
 
 | Issue | Rationale |
