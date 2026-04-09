@@ -622,9 +622,15 @@ class TasmotaIrhvac(RestoreEntity, ClimateEntity):
         self._unsubscribes = []
 
         self.availability_topic = config.get(CONF_AVAILABILITY_TOPIC)
-        if (self.availability_topic) is None:
+        if self.availability_topic is None:
             path = self.topic.split("/")
-            self.availability_topic = "tele/" + path[1] + "/LWT"
+            if len(path) >= 2:
+                self.availability_topic = "tele/" + path[1] + "/LWT"
+            else:
+                _LOGGER.warning(
+                    "Cannot derive availability topic from '%s': expected 'prefix/device/...'",
+                    self.topic,
+                )
 
         # Set _attr_*
         self._attr_unique_id = config.get(CONF_UNIQUE_ID)
@@ -737,7 +743,7 @@ class TasmotaIrhvac(RestoreEntity, ClimateEntity):
 
             for attr, prop in ATTRIBUTES_IRHVAC.items():
                 val = old_state.attributes.get(attr)
-                if val is not None:
+                if val is not None and isinstance(val, str):
                     setattr(self, "_" + prop, val)
             if old_state.state:
                 self._attr_hvac_mode = (
@@ -811,12 +817,20 @@ class TasmotaIrhvac(RestoreEntity, ClimateEntity):
         @callback
         async def state_message_received(message: mqtt.ReceiveMessage) -> None:
             """Handle new MQTT state messages."""
+            # Reject oversized payloads to prevent memory exhaustion
+            _MAX_PAYLOAD_BYTES = 10240
+            if len(message.payload) > _MAX_PAYLOAD_BYTES:
+                _LOGGER.error(
+                    "MQTT payload too large (%d bytes), ignoring", len(message.payload)
+                )
+                return
+
             try:
                 json_payload = json.loads(message.payload)
             except ValueError:
-                _LOGGER.error("Unable to parse MQTT payload as JSON: %s", message.payload)
+                _LOGGER.error("Unable to parse MQTT payload as JSON")
                 return
-            _LOGGER.debug(json_payload)
+            _LOGGER.debug("Received MQTT state message")
 
             # If listening to `tele`, result looks like: {"IrReceived":{"Protocol":"XXX", ... ,"IRHVAC":{ ... }}}
             # we want to extract the data.
@@ -832,49 +846,96 @@ class TasmotaIrhvac(RestoreEntity, ClimateEntity):
             if payload["Vendor"] == self._vendor:
                 # All values in the payload are Optional
                 prev_power = self.power_mode
+
                 if "Power" in payload:
-                    self.power_mode = payload["Power"].lower()
+                    val = payload["Power"]
+                    if isinstance(val, str):
+                        self.power_mode = val.lower()
+
                 if "Mode" in payload:
-                    self._attr_hvac_mode = payload["Mode"].lower()
-                    # Some vendors send/receive mode as fan instead of fan_only
-                    if self._attr_hvac_mode == HVACAction.FAN:
-                        self._attr_hvac_mode = HVACMode.FAN_ONLY
+                    val = payload["Mode"]
+                    if isinstance(val, str):
+                        self._attr_hvac_mode = val.lower()
+                        # Some vendors send/receive mode as fan instead of fan_only
+                        if self._attr_hvac_mode == HVACAction.FAN:
+                            self._attr_hvac_mode = HVACMode.FAN_ONLY
+
                 if "Temp" in payload:
-                    if payload["Temp"] > 0:
-                        if not (self.power_mode == STATE_OFF and self._ignore_off_temp):
-                            self._attr_target_temperature = payload["Temp"]
+                    try:
+                        temp = float(payload["Temp"])
+                    except (TypeError, ValueError):
+                        temp = None
+                    if (
+                        temp is not None
+                        and temp > 0
+                        and self._min_temp <= temp <= self._max_temp
+                        and not (self.power_mode == STATE_OFF and self._ignore_off_temp)
+                    ):
+                        self._attr_target_temperature = temp
+
                 if "Celsius" in payload:
-                    self._celsius = payload["Celsius"].lower()
+                    val = payload["Celsius"]
+                    if isinstance(val, str):
+                        self._celsius = val.lower()
+
                 if "Quiet" in payload:
-                    self._quiet = payload["Quiet"].lower()
+                    val = payload["Quiet"]
+                    if isinstance(val, str):
+                        self._quiet = val.lower()
+
                 if "Turbo" in payload:
-                    self._turbo = payload["Turbo"].lower()
+                    val = payload["Turbo"]
+                    if isinstance(val, str):
+                        self._turbo = val.lower()
+
                 if "Econo" in payload:
-                    self._econo = payload["Econo"].lower()
+                    val = payload["Econo"]
+                    if isinstance(val, str):
+                        self._econo = val.lower()
+
                 if "Light" in payload:
-                    self._light = payload["Light"].lower()
+                    val = payload["Light"]
+                    if isinstance(val, str):
+                        self._light = val.lower()
+
                 if "Filter" in payload:
-                    self._filter = payload["Filter"].lower()
+                    val = payload["Filter"]
+                    if isinstance(val, str):
+                        self._filter = val.lower()
+
                 if "Clean" in payload:
-                    self._clean = payload["Clean"].lower()
+                    val = payload["Clean"]
+                    if isinstance(val, str):
+                        self._clean = val.lower()
+
                 if "Beep" in payload:
-                    self._beep = payload["Beep"].lower()
+                    val = payload["Beep"]
+                    if isinstance(val, str):
+                        self._beep = val.lower()
+
                 if "Sleep" in payload:
                     self._sleep = payload["Sleep"]
+
+                swingv_val = None
+                swingh_val = None
+
                 if "SwingV" in payload:
-                    self._swingv = payload["SwingV"].lower()
-                    if self._swingv != "auto":
-                        self._fix_swingv = self._swingv
+                    val = payload["SwingV"]
+                    if isinstance(val, str):
+                        swingv_val = val.lower()
+                        self._swingv = swingv_val
+                        if self._swingv != "auto":
+                            self._fix_swingv = self._swingv
+
                 if "SwingH" in payload:
-                    self._swingh = payload["SwingH"].lower()
-                    if self._swingh != "auto":
-                        self._fix_swingh = self._swingh
-                if (
-                    "SwingV" in payload
-                    and payload["SwingV"].lower() == STATE_AUTO
-                    and "SwingH" in payload
-                    and payload["SwingH"].lower() == STATE_AUTO
-                ):
+                    val = payload["SwingH"]
+                    if isinstance(val, str):
+                        swingh_val = val.lower()
+                        self._swingh = swingh_val
+                        if self._swingh != "auto":
+                            self._fix_swingh = self._swingh
+
+                if swingv_val == STATE_AUTO and swingh_val == STATE_AUTO:
                     if SWING_BOTH in (self._attr_swing_modes or []):
                         self._attr_swing_mode = SWING_BOTH
                     elif SWING_VERTICAL in (self._attr_swing_modes or []):
@@ -883,36 +944,29 @@ class TasmotaIrhvac(RestoreEntity, ClimateEntity):
                         self._attr_swing_mode = SWING_HORIZONTAL
                     else:
                         self._attr_swing_mode = SWING_OFF
-                elif (
-                    "SwingV" in payload
-                    and payload["SwingV"].lower() == STATE_AUTO
-                    and SWING_VERTICAL in (self._attr_swing_modes or [])
-                ):
+                elif swingv_val == STATE_AUTO and SWING_VERTICAL in (self._attr_swing_modes or []):
                     self._attr_swing_mode = SWING_VERTICAL
-                elif (
-                    "SwingH" in payload
-                    and payload["SwingH"].lower() == STATE_AUTO
-                    and SWING_HORIZONTAL in (self._attr_swing_modes or [])
-                ):
+                elif swingh_val == STATE_AUTO and SWING_HORIZONTAL in (self._attr_swing_modes or []):
                     self._attr_swing_mode = SWING_HORIZONTAL
                 else:
                     self._attr_swing_mode = SWING_OFF
 
                 if "FanSpeed" in payload:
-                    fan_mode = payload["FanSpeed"].lower()
-                    # ELECTRA_AC fan modes fix
-                    if self.use_electra_tweak:
-                        if fan_mode == HVAC_FAN_MAX:
-                            self._attr_fan_mode = FAN_HIGH
-                        elif fan_mode == HVAC_FAN_AUTO:
-                            self._attr_fan_mode = HVAC_FAN_MAX
-                        elif fan_mode == HVAC_FAN_MIN:
-                            self._attr_fan_mode = FAN_LOW
+                    fan_mode_val = payload["FanSpeed"]
+                    fan_mode = fan_mode_val.lower() if isinstance(fan_mode_val, str) else None
+                    if fan_mode is not None:
+                        # ELECTRA_AC fan modes fix
+                        if self.use_electra_tweak:
+                            if fan_mode == HVAC_FAN_MAX:
+                                self._attr_fan_mode = FAN_HIGH
+                            elif fan_mode == HVAC_FAN_AUTO:
+                                self._attr_fan_mode = HVAC_FAN_MAX
+                            elif fan_mode == HVAC_FAN_MIN:
+                                self._attr_fan_mode = FAN_LOW
+                            else:
+                                self._attr_fan_mode = fan_mode
                         else:
                             self._attr_fan_mode = fan_mode
-                    else:
-                        self._attr_fan_mode = fan_mode
-                    _LOGGER.debug(self._attr_fan_mode)
 
                 if self._attr_hvac_mode != HVACMode.OFF:
                     self._last_on_mode = self._attr_hvac_mode
@@ -1357,7 +1411,9 @@ class TasmotaIrhvac(RestoreEntity, ClimateEntity):
             "Mode": self._last_on_mode if self._keep_mode else self._attr_hvac_mode,
             "Celsius": self._celsius,
             "Temp": round(self._attr_target_temperature / self._temp_precision)
-            * self._temp_precision,
+            * self._temp_precision
+            if self._temp_precision
+            else self._attr_target_temperature,
             "FanSpeed": fan_speed,
             "SwingV": self._swingv,
             "SwingH": self._swingh,

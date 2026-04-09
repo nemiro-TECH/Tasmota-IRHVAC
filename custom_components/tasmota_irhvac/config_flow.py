@@ -1,6 +1,8 @@
 """Config flow for Tasmota IRHVAC integration."""
 from __future__ import annotations
 
+import re
+
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.components.climate.const import (
@@ -101,6 +103,20 @@ from .const import (
 )
 
 CONF_STATE_TOPIC_2 = CONF_STATE_TOPIC + "_2"
+
+# MQTT topic may not contain null bytes or '#'/'+'  except as wildcards in valid positions.
+# For publish topics (command/availability) wildcards are forbidden entirely.
+_MQTT_TOPIC_RE = re.compile(r"^[^\x00#+ ][^\x00]*$|^[^\x00#+ ]*$")
+
+
+def _is_valid_mqtt_topic(topic: str) -> bool:
+    """Return True if topic is a valid MQTT publish topic (no wildcards)."""
+    if not topic or "\x00" in topic:
+        return False
+    # Wildcards are not allowed in publish topics
+    if "#" in topic or "+" in topic:
+        return False
+    return True
 
 KNOWN_VENDORS = [
     "AIRTON", "AIRWELL", "AMCOR", "ARGO", "AUX", "BOSCH",
@@ -266,10 +282,15 @@ class TasmotaIrhvacConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Step 1: required fields (name, vendor, MQTT topics)."""
         errors: dict = {}
         if user_input is not None:
-            await self.async_set_unique_id(user_input[CONF_COMMAND_TOPIC])
-            self._abort_if_unique_id_configured()
-            self._step1_data = user_input
-            return await self.async_step_advanced()
+            if not _is_valid_mqtt_topic(user_input.get(CONF_COMMAND_TOPIC, "")):
+                errors[CONF_COMMAND_TOPIC] = "invalid_mqtt_topic"
+            if not _is_valid_mqtt_topic(user_input.get(CONF_STATE_TOPIC, "")):
+                errors[CONF_STATE_TOPIC] = "invalid_mqtt_topic"
+            if not errors:
+                await self.async_set_unique_id(user_input[CONF_COMMAND_TOPIC])
+                self._abort_if_unique_id_configured()
+                self._step1_data = user_input
+                return await self.async_step_advanced()
 
         return self.async_show_form(
             step_id="user",
@@ -304,11 +325,18 @@ class TasmotaIrhvacOptionsFlow(config_entries.OptionsFlow):
 
     async def async_step_init(self, user_input=None):
         """Single-page form with all device settings."""
+        errors: dict = {}
         if user_input is not None:
-            return self.async_create_entry(title="", data=user_input)
+            if not _is_valid_mqtt_topic(user_input.get(CONF_COMMAND_TOPIC, "")):
+                errors[CONF_COMMAND_TOPIC] = "invalid_mqtt_topic"
+            if not _is_valid_mqtt_topic(user_input.get(CONF_STATE_TOPIC, "")):
+                errors[CONF_STATE_TOPIC] = "invalid_mqtt_topic"
+            if not errors:
+                return self.async_create_entry(title="", data=user_input)
 
         current = {**self._config_entry.data, **self._config_entry.options}
         return self.async_show_form(
             step_id="init",
             data_schema=_options_schema(current),
+            errors=errors,
         )
