@@ -1,9 +1,8 @@
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)]([https://github.com/hacs/integration](https://my.home-assistant.io/redirect/hacs_repository/?owner=nemiro-TECH&repository=Tasmota-IRHVAC&category=integration))
+# Tasmota IRHVAC
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=nemiro-TECH&repository=Tasmota-IRHVAC&category=integration)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/nemiro-TECH/Tasmota-IRHVAC)](https://github.com/nemiro-TECH/Tasmota-IRHVAC/releases)
 [![BuyMeACoffee](https://raw.githubusercontent.com/pachadotdev/buymeacoffee-badges/main/bmc-donate-yellow.svg)](https://www.buymeacoffee.com/nemiro)
 [![License:MIT](https://img.shields.io/github/license/nemiro-TECH/Tasmota-IRHVAC.svg)](LICENSE)
-
-# Tasmota IRHVAC
 
 **Home Assistant integration for controlling IR Air Conditioners via Tasmota IR transceivers over MQTT.**
 
