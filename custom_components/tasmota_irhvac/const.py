@@ -25,7 +25,7 @@ HVAC_MODE_FAN_AUTO = "fan_only_auto"
 HVAC_FAN_MAX_HIGH = "max_high"
 HVAC_FAN_AUTO_MAX = "auto_max"
 
-# Hvac moed list
+# Hvac mode list
 HVAC_MODES = [
     HVACMode.OFF,
     HVACMode.HEAT,
@@ -34,8 +34,8 @@ HVAC_MODES = [
     HVACMode.AUTO,
     HVACMode.DRY,
     HVACMode.FAN_ONLY,
-    HVAC_MODE_AUTO_FAN,
-    HVAC_MODE_FAN_AUTO,
+    # HVAC_MODE_AUTO_FAN,
+    # HVAC_MODE_FAN_AUTO,
 ]
 
 # Platform specific config entry names
