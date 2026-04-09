@@ -167,6 +167,7 @@ from .const import (
 )
 
 DEFAULT_MODES_LIST = [
+    HVACMode.OFF,  # Required by HA 2024.1+ when ClimateEntityFeature.TURN_OFF is declared
     HVACMode.COOL,
     HVACMode.HEAT,
     HVACMode.DRY,
@@ -270,10 +271,13 @@ PLATFORM_SCHEMA = CLIMATE_PLATFORM_SCHEMA.extend(
 )
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(MQTT_ENTITY_COMMON_SCHEMA.schema)
-if hasattr(mqtt, "MQTT_BASE_PLATFORM_SCHEMA"):
-    PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(mqtt.MQTT_BASE_PLATFORM_SCHEMA.schema)
-else:
-    PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(mqtt.config.MQTT_BASE_SCHEMA.schema)
+try:
+    if hasattr(mqtt, "MQTT_BASE_PLATFORM_SCHEMA"):
+        PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(mqtt.MQTT_BASE_PLATFORM_SCHEMA.schema)
+    else:
+        PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(mqtt.config.MQTT_BASE_SCHEMA.schema)
+except AttributeError:
+    pass  # PLATFORM_SCHEMA is YAML-only; config entry setup is unaffected
 
 IRHVAC_SERVICE_SCHEMA = vol.Schema({vol.Required(ATTR_ENTITY_ID): cv.entity_ids})
 
@@ -478,6 +482,12 @@ def _config_from_entry(entry) -> dict:
     for key, default in _defaults.items():
         if key not in data:
             data[key] = default
+
+    # HA 2024.1+ requires HVACMode.OFF in hvac_modes when TURN_OFF feature is declared.
+    # Guarantee it even if the user unchecked it in the form or the entry predates this fix.
+    modes = data.get(CONF_MODES_LIST)
+    if isinstance(modes, list) and HVACMode.OFF not in modes:
+        data[CONF_MODES_LIST] = [HVACMode.OFF] + modes
 
     # Use the config entry id as the entity unique_id
     data[CONF_UNIQUE_ID] = entry.entry_id

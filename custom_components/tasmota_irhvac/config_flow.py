@@ -124,6 +124,7 @@ ALL_FAN_MODES = list(dict.fromkeys([
 ]))
 
 DEFAULT_MODES_LIST = [
+    HVACMode.OFF,  # Required by HA 2024.1+ when ClimateEntityFeature.TURN_OFF is declared
     HVACMode.COOL, HVACMode.HEAT, HVACMode.DRY,
     HVAC_MODE_AUTO_FAN, HVAC_MODE_FAN_AUTO,
 ]
