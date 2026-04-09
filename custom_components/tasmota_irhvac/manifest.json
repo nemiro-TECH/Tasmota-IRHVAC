@@ -1,10 +1,7 @@
 {
   "domain": "tasmota_irhvac",
   "name": "Tasmota Irhvac",
-  "codeowners": [
-    "@hristo-atanasov",
-    "@nao-pon"
-  ],
+  "codeowners": ["@nemiro-TECH"],
   "config_flow": true,
   "dependencies": [
     "mqtt",
@@ -16,5 +13,5 @@
   "issue_tracker": "https://github.com/nemiro-TECH/Tasmota-IRHVAC/issues",
   "quality_scale": "custom",
   "requirements": [],
-  "version": "2026.4.5"
+  "version": "1.0.0"
 }
