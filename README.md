@@ -1,8 +1,7 @@
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://my.home-assistant.io/redirect/hacs_repository/?owner=nemiro-TECH&repository=Tasmota-IRHVAC&category=integration)
-[![GitHub Release](https://img.shields.io/github/release/nemiro-TECH/Tasmota-IRHVAC.svg?style=for-the-badge&color=blue)](https://github.com/nemiro-TECH/Tasmota-IRHVAC/releases)
-[![HA Minimum Version](https://img.shields.io/badge/Home%20Assistant-2024.11%2B-blue?style=for-the-badge&logo=home-assistant)](https://www.home-assistant.io/)
-[![License](https://img.shields.io/github/license/nemiro-TECH/Tasmota-IRHVAC.svg?style=for-the-badge)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/nemiro-TECH/Tasmota-IRHVAC?style=for-the-badge)](https://github.com/nemiro-TECH/Tasmota-IRHVAC/stargazers)
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)]([https://github.com/hacs/integration](https://my.home-assistant.io/redirect/hacs_repository/?owner=nemiro-TECH&repository=Tasmota-IRHVAC&category=integration))
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/nemiro-TECH/Tasmota-IRHVAC)](https://github.com/nemiro-TECH/Tasmota-IRHVAC/releases)
+[![BuyMeACoffee](https://raw.githubusercontent.com/pachadotdev/buymeacoffee-badges/main/bmc-donate-yellow.svg)](https://www.buymeacoffee.com/nemiro)
+[![License:MIT](https://img.shields.io/github/license/nemiro-TECH/Tasmota-IRHVAC.svg)](LICENSE)
 
 # Tasmota IRHVAC
 
