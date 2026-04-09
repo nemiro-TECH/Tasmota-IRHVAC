@@ -10,6 +10,8 @@
 
 Control hundreds of AC models out of the box. The integration exposes each air conditioner as a native **climate entity** — supporting modes, fan speeds, swing, presets, and vendor-specific features like turbo, econo, quiet, sleep, and more.
 
+>This project is maintained by **nemiro-TECH** and is based on the original work by
+[**Hristo Atanasov**](https://github.com/hristo-atanasov/Tasmota-IRHVAC) and contributors.
 ---
 
 ## Features
