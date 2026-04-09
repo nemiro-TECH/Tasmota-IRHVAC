@@ -413,7 +413,10 @@ async def _async_register_services(hass):
 
     async def async_service_handler(service):
         """Map services to methods on TasmotaIrhvac."""
-        method = SERVICE_TO_METHOD.get(service.service, {})
+        method = SERVICE_TO_METHOD.get(service.service)
+        if not method:
+            _LOGGER.error("Unknown service: %s", service.service)
+            return
         params = {
             key: value for key, value in service.data.items() if key != ATTR_ENTITY_ID
         }
@@ -809,7 +812,6 @@ class TasmotaIrhvac(RestoreEntity, ClimateEntity):
         @callback
         async def available_message_received(message: mqtt.ReceiveMessage) -> None:
             msg = message.payload
-            _LOGGER.debug(msg)
             if msg == "Online" or msg == "Offline":
                 self._attr_available = True if msg == "Online" else False
                 self.async_schedule_update_ha_state()
@@ -835,15 +837,20 @@ class TasmotaIrhvac(RestoreEntity, ClimateEntity):
             # If listening to `tele`, result looks like: {"IrReceived":{"Protocol":"XXX", ... ,"IRHVAC":{ ... }}}
             # we want to extract the data.
             if "IrReceived" in json_payload:
-                json_payload = json_payload["IrReceived"]
+                ir_received = json_payload["IrReceived"]
+                if not isinstance(ir_received, dict):
+                    return
+                json_payload = ir_received
 
             # By now the payload must include an `IRHVAC` field.
             if "IRHVAC" not in json_payload:
                 return
 
             payload = json_payload["IRHVAC"]
+            if not isinstance(payload, dict):
+                return
 
-            if payload["Vendor"] == self._vendor:
+            if payload.get("Vendor") == self._vendor:
                 # All values in the payload are Optional
                 prev_power = self.power_mode
 
@@ -1005,11 +1012,12 @@ class TasmotaIrhvac(RestoreEntity, ClimateEntity):
                 self.hass, self.state_topic, state_message_received
             )
         )
-        unsubscribe.append(
-            await mqtt.async_subscribe(
-                self.hass, self.availability_topic, available_message_received
+        if self.availability_topic:
+            unsubscribe.append(
+                await mqtt.async_subscribe(
+                    self.hass, self.availability_topic, available_message_received
+                )
             )
-        )
         if self.state_topic2:
             unsubscribe.append(
                 await mqtt.async_subscribe(
@@ -1295,11 +1303,12 @@ class TasmotaIrhvac(RestoreEntity, ClimateEntity):
 
         if new_state.state == STATE_ON:
             if self._attr_hvac_mode == HVACMode.OFF or self.power_mode == STATE_OFF:
-                self._attr_hvac_mode = (
+                special = (
                     self._special_mode
-                    if self._special_mode and is_special_mode
-                    else self._last_on_mode
+                    if self._special_mode and is_special_mode and self._special_mode in HVAC_MODES
+                    else None
                 )
+                self._attr_hvac_mode = special if special else self._last_on_mode
                 self.power_mode = STATE_ON
                 self.async_schedule_update_ha_state()
 
